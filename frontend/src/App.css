@@ -1,12 +1,12 @@
 .app {
   min-height: 100vh;
+  min-width: 100vw;
   display: flex;
   flex-direction: column;
 }
 
 .main-content {
   flex: 1;
-  padding: 2rem 0;
 }
 
 /* Global styles */

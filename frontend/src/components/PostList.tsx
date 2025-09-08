@@ -5,9 +5,11 @@ import './PostList.css';
 interface PostListProps {
   posts: Post[];
   users: User[];
+  onEdit: (post: Post) => void;
+  onDelete: (id: number) => void;
 }
 
-const PostList = ({ posts, users }: PostListProps) => {
+const PostList = ({ posts, users, onEdit, onDelete }: PostListProps) => {
   const getUserName = (userId: number) => {
     const user = users.find(u => u.id === userId);
     return user ? user.name : `User ${userId}`;
@@ -43,6 +45,21 @@ const PostList = ({ posts, users }: PostListProps) => {
               <p>{post.body}</p>
             </div>
           )}
+          
+          <div className="post-actions">
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={() => onEdit(post)}
+            >
+              Edit
+            </button>
+            <button 
+              className="btn btn-danger btn-sm"
+              onClick={() => onDelete(post.id)}
+            >
+              Delete
+            </button>
+          </div>
         </div>
       ))}
     </div>
