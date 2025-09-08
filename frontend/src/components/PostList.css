@@ -88,6 +88,21 @@
   margin: 0;
 }
 
+.post-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  flex: 1;
+  min-width: 80px;
+}
+
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;

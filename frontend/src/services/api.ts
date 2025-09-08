@@ -1,6 +1,6 @@
 import type { User, Post, CreateUserDto, CreatePostDto, UpdateUserDto, UpdatePostDto } from '../types';
 
-const API_BASE_URL = 'https://jsonplaceholder.typicode.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 // Users API
 export const usersApi = {
@@ -76,7 +76,7 @@ export const postsApi = {
 
   // Fetch posts by user ID
   getByUserId: async (userId: number): Promise<Post[]> => {
-    const response = await fetch(`${API_BASE_URL}/posts?userId=${userId}`);
+    const response = await fetch(`${API_BASE_URL}/posts/user/${userId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch user posts');
     }
