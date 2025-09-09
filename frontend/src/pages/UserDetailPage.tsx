@@ -87,7 +87,7 @@ const UserDetailPage = () => {
           <p className="posts-count">{posts.length} posts</p>
           
           {posts.length > 0 ? (
-            <PostList posts={posts} users={[user]} />
+            <PostList posts={posts} users={[user]} onEdit={() => {}} onDelete={() => {}} />
           ) : (
             <div className="empty-state">
               <h3>No posts found</h3>

@@ -44,7 +44,7 @@ export const usersApi = {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id, ...userData }),
+      body: JSON.stringify(userData),
     });
     if (!response.ok) {
       throw new Error('Failed to update user');
@@ -114,7 +114,7 @@ export const postsApi = {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id, ...postData }),
+      body: JSON.stringify(postData),
     });
     if (!response.ok) {
       throw new Error('Failed to update post');
