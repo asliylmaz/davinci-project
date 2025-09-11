@@ -7,6 +7,7 @@ import {
     Delete,
     Put,
     ParseIntPipe,
+    Query,
   } from '@nestjs/common';
   import { UsersService } from './users.service';
   import { CreateUserDto } from './dto/create-user.dto';
@@ -17,8 +18,11 @@ import {
     constructor(private readonly usersService: UsersService) {}
   
     @Get()
-    findAll() {
-      return this.usersService.findAll();
+    findAll(@Query('offset') offset?: string, @Query('limit') limit?: string) {
+      const o = Math.max(parseInt(offset ?? '0', 10) || 0, 0);
+      const l = Math.min(Math.max(parseInt(limit ?? '50', 10) || 50, 1), 100);
+      const data = this.usersService.findAll();
+      return data.slice(o, o + l);
     }
   
     @Get(':id')

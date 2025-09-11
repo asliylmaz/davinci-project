@@ -7,6 +7,7 @@ import {
     Delete,
     Put,
     ParseIntPipe,
+    Query,
   } from '@nestjs/common';
   import { PostsService } from './posts.service';
   import { CreatePostDto } from './dto/create-post.dto';
@@ -17,13 +18,19 @@ import {
     constructor(private readonly postsService: PostsService) {}
   
     @Get()
-    findAll() {
-      return this.postsService.findAll();
+    findAll(@Query('offset') offset?: string, @Query('limit') limit?: string) {
+      const o = Math.max(parseInt(offset ?? '0', 10) || 0, 0);
+      const l = Math.min(Math.max(parseInt(limit ?? '50', 10) || 50, 1), 100);
+      const data = this.postsService.findAll();
+      return data.slice(o, o + l);
     }
   
   @Get('user/:userId')
-  findByUserId(@Param('userId', ParseIntPipe) userId: number) {
-    return this.postsService.findByUserId(userId);
+  findByUserId(@Param('userId', ParseIntPipe) userId: number, @Query('offset') offset?: string, @Query('limit') limit?: string) {
+    const o = Math.max(parseInt(offset ?? '0', 10) || 0, 0);
+    const l = Math.min(Math.max(parseInt(limit ?? '50', 10) || 50, 1), 100);
+    const data = this.postsService.findByUserId(userId);
+    return data.slice(o, o + l);
   }
 
   @Get(':id')

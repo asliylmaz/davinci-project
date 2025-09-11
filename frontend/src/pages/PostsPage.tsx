@@ -4,15 +4,19 @@ import type { Post, User, CreatePostDto, UpdatePostDto } from '../types';
 import PostList from '../components/PostList';
 import PostForm from '../components/PostForm';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import './PostsPage.css';
+import { useToast } from '../components/Toast';
 
 const PostsPage = () => {
+  const { show } = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [confirmId, setConfirmId] = useState<number | null>(null);
 
   useEffect(() => {
     loadData();
@@ -41,6 +45,7 @@ const PostsPage = () => {
       const newPost = await postsApi.create(postData);
       setPosts(prev => [...prev, { ...newPost, id: Date.now() }]); // Simulate new ID
       setShowModal(false);
+      show('Post created successfully');
     } catch (err) {
       setError('Failed to create post');
       console.error('Error creating post:', err);
@@ -55,6 +60,7 @@ const PostsPage = () => {
       ));
       setEditingPost(null);
       setShowModal(false);
+      show('Post updated successfully');
     } catch (err) {
       setError('Failed to update post');
       console.error('Error updating post:', err);
@@ -62,14 +68,18 @@ const PostsPage = () => {
   };
 
   const handleDeletePost = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this post?')) {
-      try {
-        await postsApi.delete(id);
-        setPosts(prev => prev.filter(post => post.id !== id));
-      } catch (err) {
-        setError('Failed to delete post');
-        console.error('Error deleting post:', err);
-      }
+    setConfirmId(id);
+  };
+  const confirmDelete = async () => {
+    if (confirmId == null) return;
+    try {
+      await postsApi.delete(confirmId);
+      setPosts(prev => prev.filter(post => post.id !== confirmId));
+      setConfirmId(null);
+      show('Post deleted successfully', 'info');
+    } catch (err) {
+      setError('Failed to delete post');
+      console.error('Error deleting post:', err);
     }
   };
 
@@ -139,6 +149,16 @@ const PostsPage = () => {
               onCancel={() => setShowModal(false)}
             />
           </Modal>
+        )}
+
+        {confirmId !== null && (
+          <ConfirmModal
+            title="Delete Post"
+            message="This action cannot be undone. Are you sure?"
+            confirmText="Delete"
+            onConfirm={confirmDelete}
+            onCancel={() => setConfirmId(null)}
+          />
         )}
       </div>
     </div>
