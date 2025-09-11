@@ -4,14 +4,18 @@ import type { User } from '../types';
 import UserCard from '../components/UserCard';
 import UserForm from '../components/UserForm';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import './UsersPage.css';
+import { useToast } from '../components/Toast';
 
 const UsersPage = () => {
+  const { show } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [confirmId, setConfirmId] = useState<number | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -36,6 +40,7 @@ const UsersPage = () => {
       const newUser = await usersApi.create(userData);
       setUsers(prev => [...prev, { ...newUser, id: Date.now() }]); // Simulate new ID
       setShowModal(false);
+      show('User created successfully');
     } catch (err) {
       setError('Failed to create user');
       console.error('Error creating user:', err);
@@ -50,6 +55,7 @@ const UsersPage = () => {
       ));
       setEditingUser(null);
       setShowModal(false);
+      show('User updated successfully');
     } catch (err) {
       setError('Failed to update user');
       console.error('Error updating user:', err);
@@ -57,14 +63,18 @@ const UsersPage = () => {
   };
 
   const handleDeleteUser = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await usersApi.delete(id);
-        setUsers(prev => prev.filter(user => user.id !== id));
-      } catch (err) {
-        setError('Failed to delete user');
-        console.error('Error deleting user:', err);
-      }
+    setConfirmId(id);
+  };
+  const confirmDelete = async () => {
+    if (confirmId == null) return;
+    try {
+      await usersApi.delete(confirmId);
+      setUsers(prev => prev.filter(user => user.id !== confirmId));
+      setConfirmId(null);
+      show('User deleted successfully', 'info');
+    } catch (err) {
+      setError('Failed to delete user');
+      console.error('Error deleting user:', err);
     }
   };
 
@@ -139,6 +149,16 @@ const UsersPage = () => {
               onCancel={() => setShowModal(false)}
             />
           </Modal>
+        )}
+
+        {confirmId !== null && (
+          <ConfirmModal
+            title="Delete User"
+            message="This action cannot be undone. Are you sure?"
+            confirmText="Delete"
+            onConfirm={confirmDelete}
+            onCancel={() => setConfirmId(null)}
+          />
         )}
       </div>
     </div>

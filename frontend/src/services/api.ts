@@ -16,7 +16,9 @@ async function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit, ti
   }
 }
 
-async function safeFetch<T = unknown>(url: string, init?: RequestInit, timeoutMs?: number): Promise<T> {
+function sleep(ms: number) { return new Promise(res => setTimeout(res, ms)); }
+
+async function safeFetch<T = unknown>(url: string, init?: RequestInit, timeoutMs?: number, retry: number = 2, backoffMs: number = 300): Promise<T> {
   try {
     const response = await fetchWithTimeout(url, init, timeoutMs);
     if (!response.ok) {
@@ -33,6 +35,10 @@ async function safeFetch<T = unknown>(url: string, init?: RequestInit, timeoutMs
   } catch (err) {
     if ((err as Error).name === 'AbortError') {
       throw new Error('Request timeout');
+    }
+    if (retry > 0) {
+      await sleep(backoffMs);
+      return safeFetch<T>(url, init, timeoutMs, retry - 1, backoffMs * 2);
     }
     throw err;
   }
