@@ -1,14 +1,16 @@
 .footer {
-  background: #34495e;
+  background: rgba(44, 62, 80, 0.95);
+  backdrop-filter: blur(10px);
   color: white;
   padding: 2rem 0;
   margin-top: auto;
+  border-top: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .footer-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   text-align: center;
 }
 
@@ -18,11 +20,13 @@
 }
 
 .footer-container a {
-  color: #3498db;
+  color: #667eea;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .footer-container a:hover {
-  color: #5dade2;
+  color: #764ba2;
+  text-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
 }

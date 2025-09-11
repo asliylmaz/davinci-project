@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { memo } from 'react';
 import type { Post, User } from '../types';
 import './PostList.css';
 
@@ -9,7 +10,7 @@ interface PostListProps {
   onDelete: (id: number) => void;
 }
 
-const PostList = ({ posts, users, onEdit, onDelete }: PostListProps) => {
+const PostListComponent = ({ posts, users, onEdit, onDelete }: PostListProps) => {
   const getUserName = (userId: number) => {
     const user = users.find(u => u.id === userId);
     return user ? user.name : `User ${userId}`;
@@ -65,5 +66,17 @@ const PostList = ({ posts, users, onEdit, onDelete }: PostListProps) => {
     </div>
   );
 };
+
+const areEqual = (prev: PostListProps, next: PostListProps) => {
+  if (prev.posts.length !== next.posts.length || prev.users.length !== next.users.length) return false;
+  // Shallow compare ids to avoid costly deep checks
+  const prevPostIds = prev.posts.map(p => p.id).join(',');
+  const nextPostIds = next.posts.map(p => p.id).join(',');
+  const prevUserIds = prev.users.map(u => u.id).join(',');
+  const nextUserIds = next.users.map(u => u.id).join(',');
+  return prevPostIds === nextPostIds && prevUserIds === nextUserIds && prev.onEdit === next.onEdit && prev.onDelete === next.onDelete;
+};
+
+const PostList = memo(PostListComponent, areEqual);
 
 export default PostList;

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { memo } from 'react';
 import type { User } from '../types';
 import UserCard from './UserCard';
 import './UserList.css';
@@ -11,7 +12,7 @@ interface UserListProps {
   error?: string | null;
 }
 
-const UserList = ({ users, onEdit, onDelete, loading, error }: UserListProps) => {
+const UserListComponent = ({ users, onEdit, onDelete, loading, error }: UserListProps) => {
   if (loading) {
     return (
       <div className="user-list">
@@ -54,5 +55,15 @@ const UserList = ({ users, onEdit, onDelete, loading, error }: UserListProps) =>
     </div>
   );
 };
+
+const areEqual = (prev: UserListProps, next: UserListProps) => {
+  if (prev.loading !== next.loading || prev.error !== next.error) return false;
+  if (prev.users.length !== next.users.length) return false;
+  const prevIds = prev.users.map(u => u.id).join(',');
+  const nextIds = next.users.map(u => u.id).join(',');
+  return prevIds === nextIds && prev.onEdit === next.onEdit && prev.onDelete === next.onDelete;
+};
+
+const UserList = memo(UserListComponent, areEqual);
 
 export default UserList;

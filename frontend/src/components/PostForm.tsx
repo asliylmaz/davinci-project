@@ -50,40 +50,42 @@ const PostForm = ({ post, users, onSubmit, onCancel }: PostFormProps) => {
       <h2>{post ? 'Edit Post' : 'Create New Post'}</h2>
       
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="userId" className="form-label">
-            Author *
-          </label>
-          <select
-            id="userId"
-            name="userId"
-            value={formData.userId}
-            onChange={handleChange}
-            className="form-input"
-            required
-          >
-            {users.map(user => (
-              <option key={user.id} value={user.id}>
-                {user.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="userId" className="form-label">
+              Author *
+            </label>
+            <select
+              id="userId"
+              name="userId"
+              value={formData.userId}
+              onChange={handleChange}
+              className="form-input"
+              required
+            >
+              {users.map(user => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="title" className="form-label">
-            Title *
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="form-input"
-            placeholder="Enter post title"
-            required
-          />
+          <div className="form-group">
+            <label htmlFor="title" className="form-label">
+              Title *
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className="form-input"
+              placeholder="Enter post title"
+              required
+            />
+          </div>
         </div>
 
         <div className="form-group">
@@ -97,7 +99,7 @@ const PostForm = ({ post, users, onSubmit, onCancel }: PostFormProps) => {
             onChange={handleChange}
             className="form-textarea"
             placeholder="Enter post content"
-            rows={6}
+            rows={8}
           />
         </div>
 

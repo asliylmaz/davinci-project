@@ -99,9 +99,6 @@ const PostsPage = () => {
         <div className="page-header">
           <div>
             <h1>Posts Management</h1>
-            <p className="page-subtitle">
-              View and manage all posts from users
-            </p>
           </div>
           <button 
             className="btn btn-primary"
