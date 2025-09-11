@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { usersApi, postsApi } from '../services/api';
-import type { User, Post } from '../types';
+import type { User, Post, UpdatePostDto } from '../types';
 import PostList from '../components/PostList';
+import Modal from '../components/Modal';
+import PostForm from '../components/PostForm';
 import './UserDetailPage.css';
 
 const UserDetailPage = () => {
@@ -11,6 +13,8 @@ const UserDetailPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -34,6 +38,35 @@ const UserDetailPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+  const handleUpdatePost = async (id: number, postData: UpdatePostDto) => {
+    try {
+      const updatedPost = await postsApi.update(id, postData);
+      setPosts(prev => prev.map(post => 
+        post.id === id ? { ...post, ...updatedPost } : post
+      ));
+      setEditingPost(null);
+      setShowModal(false);
+    } catch (err) {
+      setError('Failed to update post');
+      console.error('Error updating post:', err);
+    }
+  };
+  const handleDeletePost = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      try {
+        await postsApi.delete(id);
+        setPosts(prev => prev.filter(post => post.id !== id));
+      } catch (err) {
+        setError('Failed to delete post');
+        console.error('Error deleting post:', err);
+      }
+    }
+  };
+
+  const openEditModal = (post: Post) => {
+    setEditingPost(post);
+    setShowModal(true);
   };
 
   if (loading) {
@@ -64,11 +97,7 @@ const UserDetailPage = () => {
   return (
     <div className="user-detail-page">
       <div className="container">
-        <div className="breadcrumb">
-          <Link to="/users">Users</Link>
-          <span> / </span>
-          <span>{user.name}</span>
-        </div>
+
 
         <div className="user-profile">
           <div className="user-avatar-large">
@@ -87,13 +116,27 @@ const UserDetailPage = () => {
           <p className="posts-count">{posts.length} posts</p>
           
           {posts.length > 0 ? (
-            <PostList posts={posts} users={[user]} onEdit={() => {}} onDelete={() => {}} />
+            <PostList posts={posts} users={[user]} onEdit={openEditModal} onDelete={handleDeletePost} />
           ) : (
             <div className="empty-state">
               <h3>No posts found</h3>
               <p>This user hasn't written any posts yet.</p>
             </div>
           )}
+          {showModal && (
+            <Modal onClose={() => setShowModal(false)}>
+              <PostForm
+                post={editingPost}
+                users={[user]}
+                onSubmit={(data: UpdatePostDto) => {
+                  if (editingPost) {
+                  handleUpdatePost(editingPost.id, data as UpdatePostDto);
+                }
+              }}
+              onCancel={() => setShowModal(false)}
+            />
+          </Modal>
+        )}
         </div>
       </div>
     </div>

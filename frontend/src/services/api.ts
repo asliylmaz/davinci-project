@@ -2,64 +2,84 @@ import type { User, Post, CreateUserDto, CreatePostDto, UpdateUserDto, UpdatePos
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
+// Fetch helpers: timeout + centralized error handling
+const DEFAULT_TIMEOUT_MS = 10000;
+
+async function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit, timeoutMs: number = DEFAULT_TIMEOUT_MS): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(input, { ...init, signal: controller.signal });
+    return response;
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+async function safeFetch<T = unknown>(url: string, init?: RequestInit, timeoutMs?: number): Promise<T> {
+  try {
+    const response = await fetchWithTimeout(url, init, timeoutMs);
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      throw new Error(`Request failed ${response.status}: ${text || response.statusText}`);
+    }
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return response.json() as Promise<T>;
+    }
+    // Fallback: try text and cast
+    const text = await response.text();
+    return text as unknown as T;
+  } catch (err) {
+    if ((err as Error).name === 'AbortError') {
+      throw new Error('Request timeout');
+    }
+    throw err;
+  }
+}
+
 // Users API
 export const usersApi = {
   // Fetch all users
   getAll: async (): Promise<User[]> => {
-    const response = await fetch(`${API_BASE_URL}/users`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch users');
-    }
-    return response.json();
+    return safeFetch<User[]>(`${API_BASE_URL}/users`);
   },
 
   // Fetch user by ID
   getById: async (id: number): Promise<User> => {
-    const response = await fetch(`${API_BASE_URL}/users/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch user');
-    }
-    return response.json();
+    return safeFetch<User>(`${API_BASE_URL}/users/${id}`);
   },
 
   // Create new user (simulated)
   create: async (userData: CreateUserDto): Promise<User> => {
-    const response = await fetch(`${API_BASE_URL}/users`, {
+    const response = await safeFetch<User>(`${API_BASE_URL}/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(userData),
     });
-    if (!response.ok) {
-      throw new Error('Failed to create user');
-    }
-    return response.json();
+    return response;
   },
 
   // Update user (simulated)
   update: async (id: number, userData: UpdateUserDto): Promise<User> => {
-    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+    const response = await safeFetch<User>(`${API_BASE_URL}/users/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(userData),
     });
-    if (!response.ok) {
-      throw new Error('Failed to update user');
-    }
-    return response.json();
+    return response;
   },
 
   // Delete user (simulated)
   delete: async (id: number): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/users/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) {
-      throw new Error('Failed to delete user');
-    }
+    if (!response.ok) throw new Error('Failed to delete user');
   },
 };
 
@@ -67,68 +87,48 @@ export const usersApi = {
 export const postsApi = {
   // Fetch all posts
   getAll: async (): Promise<Post[]> => {
-    const response = await fetch(`${API_BASE_URL}/posts`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch posts');
-    }
-    return response.json();
+    return safeFetch<Post[]>(`${API_BASE_URL}/posts`);
   },
 
   // Fetch posts by user ID
   getByUserId: async (userId: number): Promise<Post[]> => {
-    const response = await fetch(`${API_BASE_URL}/posts/user/${userId}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch user posts');
-    }
-    return response.json();
+    return safeFetch<Post[]>(`${API_BASE_URL}/posts/user/${userId}`);
   },
 
   // Fetch post by ID
   getById: async (id: number): Promise<Post> => {
-    const response = await fetch(`${API_BASE_URL}/posts/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch post');
-    }
-    return response.json();
+    return safeFetch<Post>(`${API_BASE_URL}/posts/${id}`);
   },
 
   // Create new post (simulated)
   create: async (postData: CreatePostDto): Promise<Post> => {
-    const response = await fetch(`${API_BASE_URL}/posts`, {
+    const response = await safeFetch<Post>(`${API_BASE_URL}/posts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(postData),
     });
-    if (!response.ok) {
-      throw new Error('Failed to create post');
-    }
-    return response.json();
+    return response;
   },
 
   // Update post (simulated)
   update: async (id: number, postData: UpdatePostDto): Promise<Post> => {
-    const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+    const response = await safeFetch<Post>(`${API_BASE_URL}/posts/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(postData),
     });
-    if (!response.ok) {
-      throw new Error('Failed to update post');
-    }
-    return response.json();
+    return response;
   },
 
   // Delete post (simulated)
   delete: async (id: number): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/posts/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) {
-      throw new Error('Failed to delete post');
-    }
+    if (!response.ok) throw new Error('Failed to delete post');
   },
 };
