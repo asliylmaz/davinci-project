@@ -1,11 +1,13 @@
  Da Vinci Project
 
 - frontend/ → React + TypeScript + Vite
+  
 cd frontend
 npm install
 npm run dev
 
 - backend/ → NestJS (TypeScript)
+  
 cd backend
 npm install
 npm start
