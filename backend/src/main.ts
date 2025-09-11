@@ -17,10 +17,10 @@ async function bootstrap() {
 
   // CORS Configuration
   app.enableCors({
-    origin: configService.get('CORS_ORIGIN', 'http://localhost:5173'),
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
+    origin: process.env.CORS_ORIGIN?.split(','),
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
+  
   
   // Global Validation Pipe
   app.useGlobalPipes(new ValidationPipe({ 
