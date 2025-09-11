@@ -3,14 +3,20 @@
 - frontend/ → React + TypeScript + Vite
   
 cd frontend
+
 npm install
+
 npm run dev
+
 
 - backend/ → NestJS (TypeScript)
   
 cd backend
+
 npm install
+
 npm start
+
 
  🚀 Live
 - Frontend (Vercel): https://davinci-project-qq8hmbp6b-aslis-projects-d7c18e15.vercel.app
