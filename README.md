@@ -19,7 +19,7 @@ npm start
 
 
 ## 🚀 Live
-- Frontend (Vercel): [https://davinci-project-qq8hmbp6b-aslis-projects-d7c18e15.vercel.app](https://davinci-project-qq8hmbp6b-aslis-projects-d7c18e15.vercel.app)  
+- Frontend (Vercel): [https://davinci-project-weld.vercel.app/](https://davinci-project-weld.vercel.app/)  
 - Backend (Render): [https://davinci-project-backend.onrender.com/api](https://davinci-project-backend.onrender.com/api)
 
 ## 🛠 Technologies
