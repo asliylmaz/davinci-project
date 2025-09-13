@@ -10,6 +10,17 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider } from './components/Toast';
 
 function App() {
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch("https://davinci-project-backend.onrender.com/api/health")
+        .then(() => console.log("Backend keep-alive ping sent"))
+        .catch(err => console.error("Keep-alive failed:", err));
+    }, 5 * 60 * 1000); // 5 dakika
+
+    return () => clearInterval(interval);
+  }, []);
+  
   return (
     <Router>
       <ErrorBoundary>
