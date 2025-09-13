@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from "react";
 import HomePage from './pages/HomePage';
 import UsersPage from './pages/UsersPage';
 import PostsPage from './pages/PostsPage';
